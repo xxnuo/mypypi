@@ -1,5 +1,6 @@
 import httpx
 from fastapi import APIRouter, Response
+from urllib.parse import urljoin
 
 import mypypi_server.config as config
 
@@ -31,9 +32,13 @@ async def package_info(package: str):
 @pypi_router.get("/packages/{path:path}")
 async def download_package(path: str):
     """下载包文件"""
-    # 从上游 PyPI 服务器下载包
+    # 构建正确的包下载 URL
+    # 从 simple 页面获取的包下载链接通常是相对路径，需要基于源 URL 构建完整的下载链接
+    root_url = config.ROOT_PYPI_URL.rsplit("/simple/", 1)[0]
+    package_url = f"{root_url}/packages/{path}"
+    
     async with httpx.AsyncClient() as client:
-        response = await client.get(f"{config.ROOT_PYPI_URL}../../packages/{path}")
+        response = await client.get(package_url)
         return Response(
             content=response.content,
             media_type=response.headers.get("content-type", "application/octet-stream"),

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import mypypi_server.config as config
 from mypypi_server.router.pypi import pypi_router
+from mypypi_server.router.utils import utils_router
 
 app = FastAPI(
     title="MyPyPi Server",
@@ -22,9 +23,6 @@ if config.DISABLE_CORS:
     )
 
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+app.include_router(utils_router)
 
-
-app.include_router(pypi_router, prefix="/pypi")
+app.include_router(pypi_router)
