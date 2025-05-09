@@ -1,0 +1,14 @@
+[project]
+name = "mypypi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "cython>=3.1.0",
+    "fastapi>=0.115.12",
+    "httpx[socks]>=0.28.1",
+    "python-dotenv>=1.1.0",
+    "sqlmodel>=0.0.24",
+    "uvicorn[standard]>=0.34.2",
+]
