@@ -8,7 +8,6 @@ dependencies = [
     "cython>=3.1.0",
     "fastapi>=0.115.12",
     "httpx[socks]>=0.28.1",
-    "pip>=25.1.1",
     "python-dotenv>=1.1.0",
     "sqlmodel>=0.0.24",
     "uvicorn[standard]>=0.34.2",
