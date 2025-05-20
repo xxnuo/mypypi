@@ -1,14 +1,15 @@
 [project]
 name = "mypypi"
 version = "0.1.0"
-description = "Add your description here"
+description = "A pypi server with a modern Web interface, customizable packages, caching, and mirroring functionality."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
-    "cython>=3.1.0",
-    "fastapi>=0.115.12",
-    "httpx[socks]>=0.28.1",
+    "beautifulsoup4>=4.13.4",
+    "pip>=25.1.1",
+    "pypi-browser-webapp>=0.0.12",
+    "pypiserver>=2.3.2",
     "python-dotenv>=1.1.0",
-    "sqlmodel>=0.0.24",
+    "requests>=2.32.3",
     "uvicorn[standard]>=0.34.2",
 ]
