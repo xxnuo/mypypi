@@ -301,33 +301,33 @@ name = "mypypi"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "beautifulsoup4" },
     { name = "pip" },
     { name = "pypi-browser-webapp" },
     { name = "pypiserver" },
     { name = "python-dotenv" },
-    { name = "requests" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "beautifulsoup4" },
+    { name = "requests" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "pip", specifier = ">=25.1.1" },
-    { name = "pypi-browser-webapp", specifier = ">=0.0.12" },
-    { name = "pypiserver", specifier = ">=2.3.2" },
+    { name = "pypi-browser-webapp", directory = "thirdparty/pypi-browser" },
+    { name = "pypiserver", directory = "thirdparty/pypiserver" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
-    { name = "requests", specifier = ">=2.32.3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.34.2" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "beautifulsoup4", specifier = ">=4.13.4" }]
+dev = [
+    { name = "beautifulsoup4", specifier = ">=4.13.4" },
+    { name = "requests", specifier = ">=2.32.3" },
+]
 
 [[package]]
 name = "packaging"
@@ -371,7 +371,7 @@ wheels = [
 [[package]]
 name = "pypi-browser-webapp"
 version = "0.0.12"
-source = { registry = "https://mirrors.ustc.edu.cn/pypi/simple" }
+source = { directory = "thirdparty/pypi-browser" }
 dependencies = [
     { name = "aiofiles" },
     { name = "fluffy-code" },
@@ -383,23 +383,38 @@ dependencies = [
     { name = "pygments" },
     { name = "starlette" },
 ]
-sdist = { url = "https://mirrors.ustc.edu.cn/pypi/packages/fc/91/57b0a8a8c2ad627003b148bbe0934d1ec42398d37b19f6acaa6ea3f7a1e6/pypi_browser_webapp-0.0.12.tar.gz", hash = "sha256:a1bd16e501a1854946e9726984ced25167e4b4b9736f5217339b0d62226d0c5b", size = 67512, upload-time = "2024-06-04T03:59:25.72Z" }
-wheels = [
-    { url = "https://mirrors.ustc.edu.cn/pypi/packages/58/26/3e638bffd9273bcaa009140f118a82640b756ff1ec2269ade93dd3eee3d3/pypi_browser_webapp-0.0.12-py3-none-any.whl", hash = "sha256:851f5a0a74c9183c6331e88e39980fb03d0c2406921a31889d55df5ab309c326", size = 69747, upload-time = "2024-06-04T03:59:23.298Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "aiofiles" },
+    { name = "fluffy-code" },
+    { name = "httpx" },
+    { name = "identify" },
+    { name = "jinja2" },
+    { name = "markupsafe" },
+    { name = "packaging" },
+    { name = "pygments" },
+    { name = "starlette" },
 ]
 
 [[package]]
 name = "pypiserver"
 version = "2.3.2"
-source = { registry = "https://mirrors.ustc.edu.cn/pypi/simple" }
+source = { directory = "thirdparty/pypiserver" }
 dependencies = [
     { name = "packaging" },
     { name = "pip" },
 ]
-sdist = { url = "https://mirrors.ustc.edu.cn/pypi/packages/78/a8/b96f8c6d1e788e0b5821c7cc7ccd699b710bbb2d075563bdba78164dd6a3/pypiserver-2.3.2.tar.gz", hash = "sha256:d2b16b12a667a9f356f1b022e039d5ad2c33a76986bb2fdb3f18633dbb1afca3", size = 196324, upload-time = "2024-11-24T21:37:58.039Z" }
-wheels = [
-    { url = "https://mirrors.ustc.edu.cn/pypi/packages/85/df/7b9b4a4b8fa8dc1550a8f430ac10eb2c45ea9e493939d644f485a717de25/pypiserver-2.3.2-py2.py3-none-any.whl", hash = "sha256:67c30d2a1a2cea1c4cf6785ddfbce958dc8ee7978e56a54b5f4ebc0c5cb89079", size = 100699, upload-time = "2024-11-24T21:37:54.934Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "importlib-resources", marker = "python_full_version >= '3.9' and python_full_version < '3.12'" },
+    { name = "packaging", specifier = ">=23.2" },
+    { name = "passlib", marker = "extra == 'passlib'", specifier = ">=1.6" },
+    { name = "pip", specifier = ">=7" },
+    { name = "watchdog", marker = "extra == 'cache'" },
 ]
+provides-extras = ["passlib", "cache"]
 
 [[package]]
 name = "pyquery"

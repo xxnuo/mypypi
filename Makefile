@@ -1,5 +1,5 @@
-install:
+update:
 	git submodule update --init --recursive
-	uv sync
-	uv pip install -e ./thirdparty/pypi-browser
 
+install: update
+	uv sync --all-groups

@@ -22,7 +22,7 @@ _py_file_path = Path(__file__).parent
 PACKAGES_FILE = _py_file_path / "sync/packages.txt"
 SOURCE_FILE = _py_file_path / "sync/source.txt"
 DATA_DIR = _py_file_path / "sync/data"
-PYPI_DIR = _py_file_path / "../cache"
+PYPI_DIR = _py_file_path / "../packages"
 PROGRESS_FILE = _py_file_path / "sync/sync_metadata.json"
 CHUNK_SIZE = 8192
 
