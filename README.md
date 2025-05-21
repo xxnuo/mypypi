@@ -104,5 +104,5 @@ This project is licensed under the [Apache License 2.0](LICENSE).
 
 ## Acknowledgements
 
-- [pypiserver](https://github.com/pypiserver/pypiserver.git)
+- [pypiserver](https://github.com/xxnuo/pypiserver.git)
 - [pypi-browser](https://github.com/xxnuo/pypi-browser.git)
