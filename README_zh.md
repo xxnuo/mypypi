@@ -103,5 +103,5 @@ pip config set global.index-url http://localhost:10608/simple
 
 ## 致谢
 
-- [pypiserver](https://github.com/pypiserver/pypiserver.git)
+- [pypiserver](https://github.com/xxnuo/pypiserver.git)
 - [pypi-browser](https://github.com/xxnuo/pypi-browser.git) 
