@@ -5,11 +5,15 @@ description = "A pypi server with a modern Web interface, customizable packages,
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "beautifulsoup4>=4.13.4",
     "pip>=25.1.1",
     "pypi-browser-webapp>=0.0.12",
     "pypiserver>=2.3.2",
     "python-dotenv>=1.1.0",
-    "requests>=2.32.3",
     "uvicorn[standard]>=0.34.2",
+]
+
+[dependency-groups]
+dev = [
+    "beautifulsoup4>=4.13.4",
+    "requests>=2.32.3",
 ]

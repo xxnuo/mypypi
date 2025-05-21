@@ -310,6 +310,11 @@ dependencies = [
     { name = "uvicorn", extra = ["standard"] },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "beautifulsoup4" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
@@ -320,6 +325,9 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.34.2" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "beautifulsoup4", specifier = ">=4.13.4" }]
 
 [[package]]
 name = "packaging"

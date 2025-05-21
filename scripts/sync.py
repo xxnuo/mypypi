@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+# ================================
+#
+# 此脚本用来同步 SOURCE_FILE 的 PACKAGES_FILE 内的指定包到指定路径 PYPI_DIR，
+# 以包名分文件夹存放 whl 文件，并重命名文件，移除 SHA256 校验部分，
+# 并在 PROGRESS_FILE 记录下载进度，避免重复下载。
+#
+# ================================
+
 import concurrent.futures
 import hashlib
 import json
@@ -10,21 +18,30 @@ import shutil
 from pathlib import Path
 from urllib.parse import unquote, urljoin
 
-import requests
-from bs4 import BeautifulSoup
+_py_file_path = Path(__file__).parent
+PACKAGES_FILE = _py_file_path / "sync/packages.txt"
+SOURCE_FILE = _py_file_path / "sync/source.txt"
+DATA_DIR = _py_file_path / "sync/data"
+PYPI_DIR = _py_file_path / "../cache"
+PROGRESS_FILE = _py_file_path / "sync/sync_metadata.json"
+CHUNK_SIZE = 8192
+
+try:
+    import requests
+except ImportError:
+    print("requests not found, please use `uv pip install requests` to install it")
+    exit(1)
+
+try:
+    from bs4 import BeautifulSoup  # type: ignore
+except ImportError:
+    print("bs4 not found, please use `uv pip install beautifulsoup4` to install it")
+    exit(1)
 
 # 设置日志
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
-# 全局常量
-CHUNK_SIZE = 8192
-PROGRESS_FILE = "sync/sync_metadata.json"
-PACKAGES_FILE = "sync/packages.txt"
-SOURCE_FILE = "sync/source.txt"
-DATA_DIR = "sync/data"
-PYPI_DIR = "pypi"
 
 
 class DownloadManager:
