@@ -2,6 +2,8 @@
 
 A PyPI server with a modern Web interface, customizable packages, caching, and mirroring functionality.
 
+[中文说明](README_zh.md)
+
 ## Features
 
 - **Modern Web Interface**: Clean and intuitive UI for browsing packages
