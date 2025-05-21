@@ -11,7 +11,7 @@ update:
 install: update
 	$(UV) sync --all-groups
 
-build:
+build: update
 	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt
 	docker buildx build \
 		--platform linux/386,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x \
@@ -26,7 +26,7 @@ build:
 test:
 	docker run -p 10608:10608 -p 10609:10609 --rm --name $(NAME) $(IMAGE):$(VERSION) 
 
-push:
+push: update
 	docker buildx build \
 		--platform linux/386,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x \
 		--build-arg HTTP_PROXY=$(ENV_PROXY) \
