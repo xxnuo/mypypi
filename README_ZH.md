@@ -55,6 +55,27 @@ environment:
 
 ### 使用方法
 
+#### uv
+
+要使用您的 MyPyPI 服务器，您需要配置 uv 使用您的服务器，例如：
+
+```bash
+# 从服务器安装软件包
+uv add -i http://localhost:10608/simple some-package
+
+# 配置 uv 始终使用您的服务器(仅供参考，请根据实际情况配置)
+mkdir -p ~/.config/uv && \
+    printf '%s\n' \
+    '[[index]]' \
+    'url = "http://localhost:10608/simple"' \
+    'default = true' \
+    > ~/.config/uv/uv.toml
+```
+
+> 更多关于 uv 的配置，请参考 [uv 文档](https://docs.astral.sh/uv/concepts/projects/dependencies/#dependency-sources)
+
+#### pip
+
 要使用您的 MyPyPI 服务器，您需要配置 pip 使用您的服务器，例如：
 
 ```bash
