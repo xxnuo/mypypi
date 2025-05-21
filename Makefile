@@ -13,14 +13,14 @@ install: update
 build:
 	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt
 	docker buildx build \
-		--platform linux/386,linux/amd64,linux/arm64/v8,linux/arm/v7,linux/arm/v6,linux/arm/v5,linux/ppc64le,linux/s390x \
+		--platform linux/386,linux/amd64,linux/arm64,linux/ppc64le,linux/s390x \
 		--build-arg HTTP_PROXY=$(ENV_PROXY) \
 		--build-arg HTTPS_PROXY=$(ENV_PROXY) \
 		--build-arg ALL_PROXY=$(ENV_PROXY) \
 		--build-arg NO_PROXY=localhost,127.0.0.1 \
 		-t $(IMAGE):$(VERSION) \
 		-t $(IMAGE):latest \
-		--push .
+		--load .
 
 test:
 	docker run -p 10608:10608 -p 10609:10609 --rm --name $(NAME) $(IMAGE):$(VERSION) 
