@@ -12,8 +12,7 @@ WORKDIR /app
 
 COPY thirdparty thirdparty
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+RUN --mount=type=bind,source=requirements.txt,target=requirements.txt \
     pip3 install -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 COPY start.sh start.sh
