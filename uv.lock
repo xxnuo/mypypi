@@ -301,6 +301,7 @@ name = "mypypi"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "lxml" },
     { name = "pip" },
     { name = "pypi-browser-webapp" },
     { name = "pypiserver" },
@@ -316,6 +317,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "lxml", specifier = ">=5.4.0" },
     { name = "pip", specifier = ">=25.1.1" },
     { name = "pypi-browser-webapp", directory = "thirdparty/pypi-browser" },
     { name = "pypiserver", directory = "thirdparty/pypiserver" },

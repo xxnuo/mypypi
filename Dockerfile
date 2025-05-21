@@ -1,13 +1,12 @@
-FROM public.ecr.aws/docker/library/python:3.12-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources
 
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
-    apt-get update && \
-    apt-get install -y --no-install-recommends curl dumb-init
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl dumb-init && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
