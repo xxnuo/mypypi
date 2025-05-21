@@ -1,5 +1,6 @@
 VERSION := $(shell git rev-parse --short HEAD)
 IMAGE := xxnuo/mypypi
+IMAGE2 := ghcr.io/xxnuo/mypypi
 UV := ~/.local/bin/uv
 NAME := mypypi
 ENV_PROXY := http://192.168.1.200:7890
@@ -34,4 +35,6 @@ push:
 		--build-arg NO_PROXY=localhost,127.0.0.1 \
 		-t $(IMAGE):$(VERSION) \
 		-t $(IMAGE):latest \
+		-t $(IMAGE2):$(VERSION) \
+		-t $(IMAGE2):latest \
 		--push .
