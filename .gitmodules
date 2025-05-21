@@ -1,3 +1,6 @@
 [submodule "thirdparty/pypi-browser"]
 	path = thirdparty/pypi-browser
 	url = https://github.com/xxnuo/pypi-browser.git
+[submodule "thirdparty/pypiserver"]
+	path = thirdparty/pypiserver
+	url = https://github.com/pypiserver/pypiserver.git
