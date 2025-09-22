@@ -19,11 +19,11 @@ mistral-common
 mlc-llm
 nerfacc
 nerfview
+nvidia-cudnn-frontend
 onnxruntime-gpu
 open3d
 openai-whisper
 opencv-contrib-python
-opencv-python-headless
 para-attn
 piper
 polyscope
@@ -49,7 +49,6 @@ tvm
 usd-core
 vhacdx
 vllm
-whisperx
 wyoming-faster-whisper
 wyoming-piper
 xformers
