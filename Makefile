@@ -28,6 +28,8 @@ install:
 build:
 	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt
 	docker build \
+		--progress=plain \
+		--no-cache \
 		--platform linux/amd64,linux/arm64/v8 \
 		--build-arg HTTP_PROXY=$(ENV_PROXY) \
 		--build-arg HTTPS_PROXY=$(ENV_PROXY) \
@@ -43,6 +45,8 @@ test:
 push:
 	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt
 	docker build \
+		--progress=plain \
+		--no-cache \
 		--platform linux/amd64,linux/arm64/v8 \
 		--build-arg HTTP_PROXY=$(ENV_PROXY) \
 		--build-arg HTTPS_PROXY=$(ENV_PROXY) \

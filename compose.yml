@@ -1,11 +1,8 @@
 services:
   mypypi:
-    # image: xxnuo/mypypi:latest
     ports:
       - 10608:10608 # Pypi Server
       - 10609:10609 # Pypi WebUI
-    # environment:
-    #   - PYPI_BROWSER_OFF=true # Disable Pypi WebUI
     volumes:
       - ./packages:/app/packages
     restart: unless-stopped
