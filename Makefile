@@ -22,7 +22,7 @@ sync-clean:
 update:
 	git submodule update --init --recursive
 
-install: update
+install:
 	$(UV) sync --all-groups
 
 build:
@@ -38,7 +38,7 @@ build:
 		.
 
 test:
-	docker run -p 10608:10608 -p 10609:10609 --rm --name $(NAME) $(IMAGE):$(VERSION)
+	docker run -p 10608:10608 -p 10609:10609 -v ./packages:/app/packages --rm --name $(NAME) $(IMAGE):$(VERSION)
 
 push: update
 	docker build \
