@@ -13,4 +13,4 @@ if [ "${PYPI_BROWSER_OFF}" != "true" ]; then
 uvicorn pypi_browser.app:app --host ${PYPI_BROWSER_HOST} --port ${PYPI_BROWSER_PORT} --log-level warning &
 fi
 
-pypi-server run -i ${PYPI_HOST} -p ${PYPI_PORT} --fallback-url ${PYPI_UPSTREAM} --hash-algo false --server gunicorn -- ${PYPI_LOCAL_PACKAGES_DIR}
+pypi-server run -i ${PYPI_HOST} -p ${PYPI_PORT} --fallback-url ${PYPI_UPSTREAM} --hash-algo false -- ${PYPI_LOCAL_PACKAGES_DIR}
