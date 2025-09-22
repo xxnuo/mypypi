@@ -40,7 +40,8 @@ build:
 test:
 	docker run -p 10608:10608 -p 10609:10609 -v ./packages:/app/packages --rm --name $(NAME) $(IMAGE):$(VERSION)
 
-push: update
+push:
+	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt
 	docker build \
 		--platform linux/amd64,linux/arm64/v8 \
 		--build-arg HTTP_PROXY=$(ENV_PROXY) \
