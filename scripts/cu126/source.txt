@@ -1,0 +1,1 @@
+https://pypi.jetson-ai-lab.io/jp6/cu126/+simple/

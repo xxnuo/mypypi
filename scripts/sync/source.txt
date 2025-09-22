@@ -1,1 +1,0 @@
-https://pypi.jetson-ai-lab.dev/jp6/cu128/+simple/

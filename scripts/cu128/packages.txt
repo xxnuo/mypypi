@@ -33,7 +33,6 @@ nerfstudio
 nixl
 ompl
 onnxruntime-gpu
-open3d
 opencv-contrib-python
 opencv-python
 openexr

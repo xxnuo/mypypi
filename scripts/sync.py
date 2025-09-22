@@ -2,9 +2,12 @@
 
 # ================================
 #
-# 此脚本用来同步 SOURCE_FILE 的 PACKAGES_FILE 内的指定包到指定路径 PYPI_DIR，
+# 此脚本用来遍历 scripts 目录下的子目录，
+# 根据每个子目录中的 source.txt 和 packages.txt 文件，
+# 下载指定包到各自的 data 目录，
+# 然后按顺序将所有包移动到统一的 ../packages/ 路径，
 # 以包名分文件夹存放 whl 文件，并重命名文件，移除 SHA256 校验部分，
-# 并在 PROGRESS_FILE 记录下载进度，避免重复下载。
+# 新版本覆盖旧版本，并在各自的 sync_metadata.json 记录下载进度。
 #
 # ================================
 
@@ -19,11 +22,6 @@ from pathlib import Path
 from urllib.parse import unquote, urljoin
 
 _py_file_path = Path(__file__).parent
-PACKAGES_FILE = _py_file_path / "sync/packages.txt"
-SOURCE_FILE = _py_file_path / "sync/source.txt"
-DATA_DIR = _py_file_path / "sync/data"
-PYPI_DIR = _py_file_path / "../packages"
-PROGRESS_FILE = _py_file_path / "sync/sync_metadata.json"
 CHUNK_SIZE = 8192
 
 try:
@@ -45,29 +43,38 @@ logging.basicConfig(
 
 
 class DownloadManager:
-    def __init__(self):
-        self.output_dir = Path(DATA_DIR)
-        self.output_dir.mkdir(exist_ok=True)
+    def __init__(self, subdir_name):
+        self.subdir_name = subdir_name
+        self.subdir_path = _py_file_path / subdir_name
+        self.packages_file = self.subdir_path / "packages.txt"
+        self.source_file = self.subdir_path / "source.txt"
+        self.data_dir = self.subdir_path / "data"
+        # 修改：不再为每个子目录创建单独的pypi目录
+        self.progress_file = self.subdir_path / "sync_metadata.json"
+
+        # 创建必要的目录
+        self.data_dir.mkdir(exist_ok=True)
+
         self.progress = self._load_progress()
         self._build_filename_map()
 
     def _load_progress(self):
         """加载下载进度记录"""
         try:
-            if os.path.exists(PROGRESS_FILE):
-                with open(PROGRESS_FILE, "r") as f:
+            if self.progress_file.exists():
+                with open(self.progress_file, "r") as f:
                     return json.load(f)
         except Exception as e:
-            logging.warning(f"无法加载进度文件: {e}")
+            logging.warning(f"无法加载进度文件 {self.progress_file}: {e}")
         return {}
 
     def _save_progress(self):
         """保存下载进度"""
         try:
-            with open(PROGRESS_FILE, "w") as f:
+            with open(self.progress_file, "w") as f:
                 json.dump(self.progress, f)
         except Exception as e:
-            logging.error(f"保存进度失败: {e}")
+            logging.error(f"保存进度失败 {self.progress_file}: {e}")
 
     def _build_filename_map(self):
         """构建文件名到URL的映射，用于重复检测"""
@@ -84,21 +91,21 @@ class DownloadManager:
                     self.filename_map[clean_name] = url
 
         # 从data目录构建映射
-        for file_path in self.output_dir.glob("*.whl"):
+        for file_path in self.data_dir.glob("*.whl"):
             clean_name = file_path.name
             # 如果文件存在但不在进度记录中，添加一个虚拟记录
             if clean_name not in self.filename_map:
                 self.filename_map[clean_name] = f"file://{file_path}"
 
-        # 从pypi目录构建映射
-        pypi_dir = Path(PYPI_DIR)
-        if pypi_dir.exists():
+        # 修改：从统一的packages目录构建映射
+        packages_dir = _py_file_path / "../packages"
+        if packages_dir.exists():
             # 递归查找所有包目录中的whl文件
-            for file_path in pypi_dir.glob("**/*.whl"):
+            for file_path in packages_dir.glob("**/*.whl"):
                 clean_name = file_path.name
                 if clean_name not in self.filename_map:
                     self.filename_map[clean_name] = f"file://{file_path}"
-                    logging.debug(f"在pypi目录找到已存在的文件: {clean_name}")
+                    logging.debug(f"在packages目录找到已存在的文件: {clean_name}")
 
     def _calculate_file_hash(self, file_path):
         """计算文件的SHA256哈希值"""
@@ -141,17 +148,18 @@ class DownloadManager:
 
         # 检查进度记录
         if url in self.progress and self.progress[url]["status"] == "completed":
-            output_path = self.output_dir / clean_filename
-            pypi_path = None
+            output_path = self.data_dir / clean_filename
 
-            # 在pypi目录中查找文件
+            # 修改：同时检查统一packages目录
+            packages_dir = _py_file_path / "../packages"
             pkg_pattern = re.compile(r"^([a-zA-Z0-9_.-]+?)(?:-\d|[-_]\d)")
             match = pkg_pattern.match(clean_filename)
+            packages_path = None
             if match:
                 package_name = match.group(1).replace("-", "_").lower()
-                pypi_path = Path(PYPI_DIR) / package_name / clean_filename
+                packages_path = packages_dir / package_name / clean_filename
 
-            # 检查data目录或pypi目录是否存在文件
+            # 检查data目录或packages目录是否存在文件
             if output_path.exists():
                 file_hash = self._calculate_file_hash(output_path)
                 if file_hash == self.progress[url]["hash"]:
@@ -159,11 +167,11 @@ class DownloadManager:
                         f"文件已存在于data目录且验证通过，跳过: {clean_filename}"
                     )
                     return True
-            elif pypi_path and pypi_path.exists():
-                file_hash = self._calculate_file_hash(pypi_path)
+            elif packages_path and packages_path.exists():
+                file_hash = self._calculate_file_hash(packages_path)
                 if file_hash == self.progress[url]["hash"]:
                     logging.info(
-                        f"文件已存在于pypi目录且验证通过，跳过: {clean_filename}"
+                        f"文件已存在于packages目录且验证通过，跳过: {clean_filename}"
                     )
                     return True
 
@@ -178,8 +186,8 @@ class DownloadManager:
 
             filename = os.path.basename(url)
             clean_filename = self._get_clean_filename(url)
-            output_path = self.output_dir / clean_filename
-            temp_path = self.output_dir / f"{clean_filename}.temp"
+            output_path = self.data_dir / clean_filename
+            temp_path = self.data_dir / f"{clean_filename}.temp"
 
             # 获取远程文件大小
             total_size = self._get_file_size(url)
@@ -244,13 +252,13 @@ class DownloadManager:
         count = 0
         pattern = re.compile(r"(.+\.whl)#sha256=.+")
 
-        for file_path in self.output_dir.glob("*.whl*"):
+        for file_path in self.data_dir.glob("*.whl*"):
             file_name = file_path.name
             match = pattern.match(file_name)
 
             if match:
                 new_name = match.group(1)
-                new_path = self.output_dir / new_name
+                new_path = self.data_dir / new_name
 
                 try:
                     # 如果目标文件已存在，先删除
@@ -277,60 +285,21 @@ class DownloadManager:
 
         logging.info(f"总共重命名了 {count} 个文件")
 
-    def organize_by_package(self):
-        """将wheel文件按照包名分类移动到pypi/目录下的包名目录内"""
-        pypi_dir = Path(PYPI_DIR)
-        pypi_dir.mkdir(exist_ok=True)
+    def read_source(self):
+        """读取PyPI源地址"""
+        if not self.source_file.exists():
+            logging.error(f"源文件不存在: {self.source_file}")
+            return None
+        with open(self.source_file, "r") as f:
+            return f.read().strip()
 
-        # 正则表达式用于从wheel文件名中提取包名
-        # 格式通常为: package_name-version-py3-none-any.whl
-        pattern = re.compile(r"^([a-zA-Z0-9_.-]+?)(?:-\d|[-_]\d)")
-
-        count = 0
-        for file_path in self.output_dir.glob("*.whl"):
-            file_name = file_path.name
-            match = pattern.match(file_name)
-
-            if match:
-                package_name = match.group(1)
-                # 处理包名中的特殊字符，如将'-'替换为'_'
-                package_name = package_name.replace("-", "_").lower()
-
-                # 创建包目录
-                package_dir = pypi_dir / package_name
-                package_dir.mkdir(exist_ok=True)
-
-                # 目标路径
-                target_path = package_dir / file_name
-
-                try:
-                    # 如果目标文件已存在，先删除
-                    if target_path.exists():
-                        target_path.unlink()
-
-                    # 移动文件到目标目录
-                    shutil.move(file_path, target_path)
-                    count += 1
-                    logging.info(f"移动文件到包目录: {file_name} -> {package_name}/")
-
-                except Exception as e:
-                    logging.error(f"移动文件失败 {file_name}: {e}")
-            else:
-                logging.warning(f"无法从文件名提取包名: {file_name}")
-
-        logging.info(f"总共整理了 {count} 个文件到包目录")
-
-
-def read_source():
-    """读取PyPI源地址"""
-    with open(SOURCE_FILE, "r") as f:
-        return f.read().strip()
-
-
-def read_packages():
-    """读取需要下载的包列表"""
-    with open(PACKAGES_FILE, "r") as f:
-        return [line.strip() for line in f if line.strip()]
+    def read_packages(self):
+        """读取需要下载的包列表"""
+        if not self.packages_file.exists():
+            logging.error(f"包文件不存在: {self.packages_file}")
+            return []
+        with open(self.packages_file, "r") as f:
+            return [line.strip() for line in f if line.strip()]
 
 
 def get_package_page(base_url, package):
@@ -377,12 +346,26 @@ def get_wheel_urls(page_content, page_url):
     return wheel_urls
 
 
-def main():
-    base_url = read_source()
-    packages = read_packages()
-    download_manager = DownloadManager()
+def download_subdirectory(subdir_name):
+    """下载单个子目录的所有包，但不移动文件"""
+    logging.info(f"开始下载子目录: {subdir_name}")
 
-    logging.info(f"开始从 {base_url} 下载包")
+    download_manager = DownloadManager(subdir_name)
+
+    # 读取源和包列表
+    base_url = download_manager.read_source()
+    if not base_url:
+        logging.error(f"无法读取 {subdir_name} 的源地址，跳过")
+        return False
+
+    packages = download_manager.read_packages()
+    if not packages:
+        logging.error(f"无法读取 {subdir_name} 的包列表，跳过")
+        return False
+
+    logging.info(
+        f"从 {base_url} 下载 {len(packages)} 个包到 {download_manager.data_dir}"
+    )
 
     for package in packages:
         logging.info(f"处理包: {package}")
@@ -406,8 +389,119 @@ def main():
     # 下载完成后重命名文件
     download_manager.rename_files_remove_hash()
 
-    # 按包名整理文件
-    download_manager.organize_by_package()
+    logging.info(f"完成子目录 {subdir_name} 的下载")
+    return True
+
+
+def organize_packages_by_priority(subdirs):
+    """按照优先级顺序将所有子目录的包组织到统一的packages目录"""
+    logging.info("开始组织包到统一的packages目录...")
+
+    # 创建统一的packages目录
+    packages_dir = _py_file_path / "../packages"
+    packages_dir.mkdir(parents=True, exist_ok=True)
+
+    # 正则表达式用于从wheel文件名中提取包名
+    pattern = re.compile(r"^([a-zA-Z0-9_.-]+?)(?:-\d|[-_]\d)")
+
+    total_moved = 0
+
+    # 按照子目录顺序处理（后面的覆盖前面的）
+    for subdir_name in subdirs:
+        logging.info(f"正在组织子目录 {subdir_name} 的包...")
+
+        data_dir = _py_file_path / subdir_name / "data"
+        if not data_dir.exists():
+            logging.warning(f"数据目录不存在: {data_dir}")
+            continue
+
+        count = 0
+        for file_path in data_dir.glob("*.whl"):
+            file_name = file_path.name
+            match = pattern.match(file_name)
+
+            if match:
+                package_name = match.group(1)
+                # 处理包名中的特殊字符，如将'-'替换为'_'
+                package_name = package_name.replace("-", "_").lower()
+
+                # 创建包目录
+                package_dir = packages_dir / package_name
+                package_dir.mkdir(exist_ok=True)
+
+                # 目标路径
+                target_path = package_dir / file_name
+
+                try:
+                    # 如果目标文件已存在，先删除（实现覆盖）
+                    if target_path.exists():
+                        logging.info(f"覆盖已存在的文件: {target_path}")
+                        target_path.unlink()
+
+                    # 移动文件到目标目录
+                    shutil.move(file_path, target_path)
+                    count += 1
+                    logging.info(f"移动文件: {file_name} -> {package_name}/")
+
+                except Exception as e:
+                    logging.error(f"移动文件失败 {file_name}: {e}")
+            else:
+                logging.warning(f"无法从文件名提取包名: {file_name}")
+
+        logging.info(f"从子目录 {subdir_name} 移动了 {count} 个文件")
+        total_moved += count
+
+    logging.info(f"总共移动了 {total_moved} 个文件到packages目录")
+
+
+def main():
+    """主函数：分两个阶段处理 - 先下载，再组织"""
+    # 获取所有子目录
+    subdirs = []
+    for item in _py_file_path.iterdir():
+        if item.is_dir() and item.name != "__pycache__":
+            # 检查是否包含必要的文件
+            if (item / "source.txt").exists() and (item / "packages.txt").exists():
+                subdirs.append(item.name)
+            else:
+                logging.warning(
+                    f"跳过目录 {item.name}：缺少 source.txt 或 packages.txt"
+                )
+
+    if not subdirs:
+        logging.error("未找到任何有效的子目录")
+        return
+
+    # 按名称排序确保处理顺序一致
+    subdirs.sort()
+    logging.info(f"找到 {len(subdirs)} 个子目录: {subdirs}")
+
+    # 第一阶段：下载所有子目录的包
+    logging.info("=" * 50)
+    logging.info("第一阶段：下载所有包...")
+    logging.info("=" * 50)
+
+    successful_subdirs = []
+    for subdir_name in subdirs:
+        try:
+            if download_subdirectory(subdir_name):
+                successful_subdirs.append(subdir_name)
+        except Exception as e:
+            logging.error(f"下载子目录 {subdir_name} 时出错: {e}")
+            continue
+
+    # 第二阶段：按顺序组织包到统一目录
+    logging.info("=" * 50)
+    logging.info("第二阶段：组织包到统一目录...")
+    logging.info("=" * 50)
+
+    if successful_subdirs:
+        try:
+            organize_packages_by_priority(successful_subdirs)
+        except Exception as e:
+            logging.error(f"组织包时出错: {e}")
+
+    logging.info("所有处理完成")
 
 
 if __name__ == "__main__":

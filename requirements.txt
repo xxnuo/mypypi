@@ -2,6 +2,8 @@
 #    uv pip compile --no-deps pyproject.toml -o requirements.txt
 lxml==5.4.0
     # via mypypi (pyproject.toml)
+passlib==1.7.4
+    # via mypypi (pyproject.toml)
 pip==25.1.1
     # via mypypi (pyproject.toml)
 thirdparty/pypi-browser
@@ -11,4 +13,6 @@ thirdparty/pypiserver
 python-dotenv==1.1.0
     # via mypypi (pyproject.toml)
 uvicorn==0.34.2
+    # via mypypi (pyproject.toml)
+watchdog==6.0.0
     # via mypypi (pyproject.toml)

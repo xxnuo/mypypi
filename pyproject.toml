@@ -6,11 +6,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "lxml>=5.4.0",
+    "passlib>=1.7.4",
     "pip>=25.1.1",
     "pypi-browser-webapp",
     "pypiserver",
     "python-dotenv>=1.1.0",
     "uvicorn[standard]>=0.34.2",
+    "watchdog>=6.0.0",
 ]
 
 [dependency-groups]
