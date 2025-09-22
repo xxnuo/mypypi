@@ -161,3 +161,4 @@ cython_debug/
 packages.zip
 /packages
 packages.tar.gz
+/packages-legacy
