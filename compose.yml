@@ -6,6 +6,8 @@ services:
     volumes:
       - ./packages:/app/packages
     restart: unless-stopped
+    environment:
+      - PYPI_UPSTREAM=https://mirrors.ustc.edu.cn/pypi/simple
     build:
       context: .
       dockerfile: Dockerfile
