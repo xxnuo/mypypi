@@ -118,7 +118,10 @@ class DownloadManager:
     def _get_file_size(self, url):
         """获取远程文件大小"""
         try:
-            response = requests.head(url)
+            headers = {
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"
+            }
+            response = requests.head(url, headers=headers)
             return int(response.headers.get("content-length", 0))
         except Exception:
             return 0
@@ -205,6 +208,9 @@ class DownloadManager:
 
             # 开始下载
             mode = "ab" if local_size > 0 else "wb"
+            headers["User-Agent"] = (
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1"
+            )
             response = requests.get(url, headers=headers, stream=True)
             response.raise_for_status()
 
@@ -307,7 +313,13 @@ def get_package_page(base_url, package):
     url = urljoin(base_url, package) + "/"
     logging.info(f"正在获取包页面: {url}")
     try:
-        response = requests.get(url)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9",
+            "Referer": base_url,
+        }
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
         return response.text, url  # 返回页面内容和实际URL
     except requests.RequestException as e:

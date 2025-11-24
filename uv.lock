@@ -414,7 +414,7 @@ requires-dist = [
 
 [[package]]
 name = "pypiserver"
-version = "2.3.2"
+version = "2.4.0"
 source = { directory = "thirdparty/pypiserver" }
 dependencies = [
     { name = "packaging" },
