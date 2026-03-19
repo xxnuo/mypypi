@@ -1,7 +1,11 @@
 bitsandbytes
 causal-conv1d
+cuda-core
+cuda-python
 diffusers
 flash-attn
+flashinfer-cubin
+flashinfer-jit-cache
 flashinfer-python
 flex-prefill
 hloc
@@ -12,10 +16,12 @@ mistral-common
 nerfacc
 nerfview
 nvidia-cudnn-frontend
+nvidia-cutlass
 onnxruntime-gpu
 opencv-contrib-python
 pyceres
 pycolmap
+pycute
 pymeshlab
 sgl-kernel
 sglang
@@ -25,6 +31,7 @@ torch-memory-saver
 torch-tensorrt
 torchao
 torchaudio
+torchcodec
 torchvision
 triton
 unsloth

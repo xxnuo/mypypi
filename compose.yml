@@ -5,6 +5,7 @@ services:
       - 10609:10609 # Pypi WebUI
     volumes:
       - ./packages:/app/packages
+      - ./tmp:/tmp
     restart: unless-stopped
     environment:
       - PYPI_UPSTREAM=https://mirrors.ustc.edu.cn/pypi/simple

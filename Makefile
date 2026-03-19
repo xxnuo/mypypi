@@ -40,7 +40,7 @@ build:
 		.
 
 test:
-	docker run -p 10608:10608 -p 10609:10609 -v ./packages:/app/packages --rm --name $(NAME) $(IMAGE):$(VERSION)
+	docker run -p 10608:10608 -p 10609:10609 -v ./packages:/app/packages -v ./tmp:/tmp --rm --name $(NAME) $(IMAGE):$(VERSION)
 
 push:
 	$(UV) pip compile --no-deps pyproject.toml -o requirements.txt

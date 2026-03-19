@@ -160,6 +160,7 @@ cython_debug/
 #.idea/
 packages.zip
 /packages
+/tmp
 packages.tar.gz
 /packages-legacy
 /scripts/*/data
